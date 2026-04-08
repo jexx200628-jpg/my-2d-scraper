@@ -1,6 +1,8 @@
 const axios = require('axios');
 const admin = require('firebase-admin');
-const serviceAccount = require("./serviceAccountKey.json");
+
+// Key ဖိုင်ကို ဖတ်မယ့်အစား Environment Variable ကနေ ယူမယ်
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -18,12 +20,10 @@ async function fetchAndUpload() {
         const set = meta.regularMarketPrice;
         const val = meta.regularMarketVolume;
 
-        // 2D တွက်ခြင်း
         const sStr = set.toFixed(2).toString();
         const vStr = val.toString();
         const twoD = sStr.charAt(sStr.length - 1) + vStr.charAt(vStr.length - 1);
 
-        // Firebase သို့ ပို့ခြင်း
         await db.ref('live_data').update({
             last_result: twoD,
             set: set.toFixed(2),
@@ -36,4 +36,5 @@ async function fetchAndUpload() {
     }
 }
 
-setInterval(fetchAndUpload, 5000); // ၅ စက္ကန့်တစ်ခါ
+setInterval(fetchAndUpload, 5000);
+
